@@ -1,0 +1,28 @@
+Greasemonkey vs Extensions vs Plugins
+
+Greasemonkey:
+    Super easy. Write once, work everywhere.
+    Have to do a hack if you want arbitrary websites to take advantage of the script
+        (make a div with an id in the html, then check for the id's existence and only load the python interpreter when that happens)
+    Annoying to deal with quoting strings of Python code
+
+Extension:
+    Different API for each browser
+    Chrome:
+        var myPort=chrome.extension.connect('yourextensionid_qwerqweroijwefoijwef', some_object_to_send_on_connect);
+        (less hacky, since extension will only run when you want it to)
+        (untested -- guy on stack overflow hasn't tried it)
+    Firefox:
+        Same as greasemonkey
+        Firefox hates the XPI package from the greasmonkey
+< img src=”chrome://youraddonname/content/skin/images/anyimagefilename” width=”0″ height=”0″ onload=”javascript: checkAddon()” style=”visibility:hidden” > (conditional to check if installed)
+
+Plugin:
+    Compile with FireBreath
+    Any site can easily check to see the list of plugins
+
+514754
+
+        
+
+We can easily switch at a later time too

@@ -1,0 +1,13 @@
+{
+    "name": "Bifrost",
+    "version": "0.1",
+    "manifest_version": 2,
+    "description": "A Python-Javascript bridge",
+    "page_action": {
+        "default_icon": "icon.png",
+        "default_title": "Bifrost: Python-Javascript bridge"
+    },
+    "permissions": [
+        "http://128.237.229.188"
+    ]
+}
