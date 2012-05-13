@@ -85,7 +85,10 @@ class Bifrost:
     self.error = None
 
   def jserror(self):
-    raise Exception(self.error)
+    err = self.error
+    self.nextId -= 1 #throw out that blob index
+    self.error = None #reset error
+    raise Exception(err)
 
   def call(self, jsstring):
     bifrost.run(jsstring)
