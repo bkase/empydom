@@ -80,26 +80,22 @@ window.bifrost = (function() {
 
     var module = {
         'blobs': blobs,
-        'createBlobFromBlobProperty': function(sourceBlobID, property, pythonBlobID){
+        'createBlobFromBlobProperty': function(sourceBlobID, property, otherBlobID){
             try {
                 var currID = createBlob(blobs[sourceBlobID].val[property]);
-                returnBlobToPython(currID, pythonBlobID);
+                returnBlobToPython(currID, otherBlobID);
             }
             catch(e) {
                 throwInPython(e.toString());
             }
         },
-        'callBlobFunction': function(parentBlobID, localBlobID, pythonBlobID, args){
-            //console.log("args: ");
-            //console.log(args);
-            //console.log("blob: ");
-            //console.log(blobs[localBlobID].val);
+        'callBlobFunction': function(parentBlobID, localBlobID, otherBlobID, args){
 
             try {
                 //TODO: make this fix less hacky (window.document(10) won't throw an error now)
                 if (blobs[localBlobID].val.apply !== undefined) {
                     var currID = createBlob(blobs[localBlobID].val.apply(blobs[parentBlobID].val, args));
-                    returnBlobToPython(currID, pythonBlobID);
+                    returnBlobToPython(currID, otherBlobID);
                 }
             }
             catch(e) {
@@ -109,7 +105,6 @@ window.bifrost = (function() {
         'getBlobPrimitive': function(localBlobID) {
             try {
                 var primitive = blobs[localBlobID].val;
-                console.log(primitive);
                 Python.eval("pyjs.primitive = " + convertToPythonObject(primitive));
             }
             catch(e) {
