@@ -1,10 +1,12 @@
 "use strict";
 
-//PyEval is Python.eval;
-//var PyEval = require(Python).eval;
+var Python = {};
 
 //TODO: Blobs on both sides (JavaScript and Python) should be reference counted
 window.bifrost = (function() {
+
+    
+    var resultCallback, initCallback, chrToFunc, isFinishedCallback;
 
     // a blob is an object with properties 'val' and 'isPrimitive'
     var blobs = {};
@@ -31,19 +33,66 @@ window.bifrost = (function() {
         }
     };
 
+    var pyeval = function(code, isResponse) {
+        worker.postMessage({
+            'action': 'pyeval',
+            'code': code,
+            'isResponse': isResponse
+        });
+    };
+
+    var pyevalForResult = function(code) {
+        worker.postMessage({
+            'action': 'pyeval',
+            'code': code,
+            'isResponse': false,
+            'wantsResult': true
+        });
+    };
+
+    var pyinitialize = function(obj) {
+        worker.postMessage({
+            'action': 'pyinitialize',
+            'obj': obj,
+        });
+    };
+
+    var pyisFinished = function(code) {
+        worker.postMessage({
+            'action': 'pyisFinished',
+            'code': code
+        });
+    }
+
+    Python.initialize = function(obj, passedChrToFunc, callback) {
+        pyinitialize(obj);
+        initCallback = callback;
+        chrToFunc = passedChrToFunc;
+    };
+
+    Python.eval = function(code, callback) {
+        pyevalForResult(code);
+        resultCallback = callback;
+    };
+
+    Python.isFinished = function(code, callback) {
+        pyisFinished(code);
+        isFinishedCallback = callback;
+    };
+
     var cleanseForPython = function (str) {
         var backslashRe = /\\/g;
         var singleQuoteRe = /\'/g;
 
         return str.replace(backslashRe, '////').replace(singleQuoteRe, '\\\'');
     };
-    
+
     var returnBlobToPython = function (localBlobID, pythonBlobID) {
-        Python.eval("pyjs.blobs[" + pythonBlobID + "] = (" + localBlobID + ", " + convertToPythonObject(blobs[localBlobID].isPrimitive) + ")");
+        pyeval("pyjs.blobs[" + pythonBlobID + "] = (" + localBlobID + ", " + convertToPythonObject(blobs[localBlobID].isPrimitive) + ")", true);
     };
 
-    var throwInPython = function(errorMessage) {
-        Python.eval("pyjs.error = '" + cleanseForPython(errorMessage) + "'")
+    var throwInPython = function(errorMessage, isResponse) {
+        pyeval("pyjs.error = '" + cleanseForPython(errorMessage) + "'", isResponse);
     };
 
     var setPrimitiveInPython = function(value) {
@@ -78,18 +127,22 @@ window.bifrost = (function() {
         }
     };
 
-    var module = {
-        'blobs': blobs,
-        'createBlobFromBlobProperty': function(sourceBlobID, property, otherBlobID){
-            try {
-                var currID = createBlob(blobs[sourceBlobID].val[property]);
-                returnBlobToPython(currID, otherBlobID);
-            }
-            catch(e) {
-                throwInPython(e.toString());
-            }
-        },
-        'callBlobFunction': function(parentBlobID, localBlobID, otherBlobID, args){
+    var respondToWorker = function() {
+        worker.postMessage({
+            'isResponse': true
+        });
+    };
+
+    var createBlobFromBlobProperty = function(sourceBlobID, property, otherBlobID){
+        try {
+            var currID = createBlob(blobs[sourceBlobID].val[property]);
+            returnBlobToPython(currID, otherBlobID);
+        }
+        catch(e) {
+            throwInPython(e.toString(), true);
+        }
+    },
+    callBlobFunction = function(parentBlobID, localBlobID, otherBlobID, args) {
 
             try {
                 //TODO: make this fix less hacky (window.document(10) won't throw an error now)
@@ -99,28 +152,74 @@ window.bifrost = (function() {
                 }
             }
             catch(e) {
-                throwInPython(e.toString());
+                throwInPython(e.toString(), true);
             }
-        },
-        'getBlobPrimitive': function(localBlobID) {
+    },
+    getBlobPrimitive = function(localBlobID) {
             try {
                 var primitive = blobs[localBlobID].val;
-                Python.eval("pyjs.primitive = " + convertToPythonObject(primitive));
+                pyeval("pyjs.primitive = " + convertToPythonObject(primitive), true);
             }
             catch(e) {
-                throwInPython(e.toString());
+                throwInPython(e.toString(), true);
             }
-        },
-        'setBlobPropertyToPrimitive': function(localBlobID, property, primitive) {
+    },
+    setBlobPropertyToPrimitive = function(localBlobID, property, primitive) {
             try {
                 blobs[localBlobID].val[property] = primitive;
+                respondToWorker();
             }
             catch(e) {
-                throwInPython(e.toString());
+                throwInPython(e.toString(), true);
             }
-        }
     }
-    
+
+    var worker = new Worker('worker-bridge.js');
+    worker.onerror = function(error) {
+        console.log(error);
+        throw(error);
+    }
+    worker.onmessage = function(event) {
+        event.preventDefault();
+        var d = event.data;
+        switch(event.data.funcCall) {
+            case 'createBlobFromBlobProperty':
+                createBlobFromBlobProperty(d.sourceBlobID, d.property, d.otherBlobID);
+                break;
+            case 'callBlobFunction':
+                callBlobFunction(d.parentBlobID, d.localBlobID, d.otherBlobID, d.args);
+                break;
+            case 'getBlobPrimitive':
+                getBlobPrimitive(d.localBlobID);
+                break;
+            case 'setBlobPropertyToPrimitive':
+                setBlobPropertyToPrimitive(d.localBlobID, d.property, d.primitive);
+                break;
+            case 'console.log':
+                console.log.apply(console, d.args);
+                break;
+            case 'resultCallback':
+                resultCallback(d.result);
+                break;
+            case 'initializeCallback':
+                initCallback();
+                break;
+            case 'setChr':
+                chrToFunc(d.chr);
+                break;
+            case 'isFinishedCallback':
+                isFinishedCallback(d.isFinished);
+                break;
+
+            default:
+                throw('This is not a proper function name');
+                break;
+        }
+    };
+
+    var module = { };
+
     return module;
 
 })();
+

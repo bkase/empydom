@@ -12,31 +12,37 @@
         var output = document.getElementById('output');
         var button = document.getElementById('button');
 
-        Python.initialize(null, function(chr) {
-          if (chr !== null) output.value += String.fromCharCode(chr);
-        });
+        var handleChr = function(chr) {
+            if (chr !== null)
+                output.value += String.fromCharCode(chr);
+        };
 
-        button.onclick = function() {
-          if (Python.isFinished(input.value)) {
-            output.value = '';
-            var result = Python.eval(input.value);
-            if (result !== null && result !== undefined) {
-              output.value += '\n--------------------------\nResult: ' + result;
-            }
-            output.scrollTop = output.scrollHeight;
-          } else {
-            output.value = 'Command not finished.';
-          }
-        }
+        Python.initialize(null, handleChr, function() {
+            button.onclick = function() {
+                Python.isFinished(input.value, function(isFinished) {
+                    if (isFinished) {
+                        output.value = '';
+                        Python.eval(input.value, function(result) {
+                            if (result !== null && result !== undefined) {
+                              output.value += '\n--------------------------\nResult: ' + result;
+                            }
+                            output.scrollTop = output.scrollHeight;
+                        });
+                    } else {
+                        output.value = 'Command not finished.';
+                    }
+                });
+            };
+        });
 
         //registerPerfTests();
       };
-     window.onBifrostReady = start;
-     //window.onload = start;
+     //window.onBifrostReady = start;
+     window.onload = start;
     </script>
   </head>
   <body>
-    <div id='give_me_empythoned_please'></div>
+    <!--<div id='give_me_empythoned_please'></div>-->
     <h1>Empythoned Demo</h1>
     <textarea id="input" style="font-family: monospace; width: 80%" rows="8">import bifrost
 
