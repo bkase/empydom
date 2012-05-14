@@ -30,9 +30,12 @@ self.bifrost = (function() {
      */
 
     var waitForResponse = function() {
-        while(pending_responses > 0) {
-            ; //NOP
-        }
+        //while(pending_responses > 0) {
+            //console.log("pending_responses: " + pending_responses); //NOP
+        //}
+        console.log("This is right before setTimeout",pending_responses);
+        setTimeout(function() { console.log("This is in setTimeout",pending_responses); }, 0);
+        console.log("This is physically after the setTimeout",pending_responses);
         //Now safely transfer context back to Python
     }
 
@@ -83,6 +86,7 @@ self.bifrost = (function() {
             });
             pending_responses += 1;
             waitForResponse();
+            console.log("I waited now pending_responses: ", pending_responses);
         },
         'callBlobFunction': function(parentBlobID, localBlobID, otherBlobID, args){
             self.postMessage({ 
@@ -94,6 +98,7 @@ self.bifrost = (function() {
             });
             pending_responses += 1;
             waitForResponse();
+            console.log("I waited now pending_responses: ", pending_responses);
         },
         'getBlobPrimitive': function(localBlobID) {
             self.postMessage({ 
@@ -102,6 +107,7 @@ self.bifrost = (function() {
             });
             pending_responses += 1;
             waitForResponse();
+            console.log("I waited now pending_responses: ", pending_responses);
         },
         'setBlobPropertyToPrimitive': function(localBlobID, property, primitive) {
             self.postMessage({
@@ -111,6 +117,7 @@ self.bifrost = (function() {
             });
             pending_responses += 1;
             waitForResponses();
+            console.log("I waited now pending_responses: ", pending_responses);
         }
     }
 

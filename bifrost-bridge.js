@@ -34,6 +34,7 @@ window.bifrost = (function() {
     };
 
     var pyeval = function(code, isResponse) {
+        console.log("About to post with ", code, " and ", isResponse);
         worker.postMessage({
             'action': 'pyeval',
             'code': code,
@@ -89,6 +90,7 @@ window.bifrost = (function() {
 
     var returnBlobToPython = function (localBlobID, pythonBlobID) {
         pyeval("pyjs.blobs[" + pythonBlobID + "] = (" + localBlobID + ", " + convertToPythonObject(blobs[localBlobID].isPrimitive) + ")", true);
+        console.log("sent the pyeval from returnBlobToPython");
     };
 
     var throwInPython = function(errorMessage, isResponse) {

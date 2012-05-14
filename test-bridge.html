@@ -66,6 +66,7 @@ class JSWrapper:
 
     def __getattr__(self, attr):
         newID = self.pyjs__.getJSBlobProperty(self.jsID__, attr)
+        self.pyjs__.call("console.log('hopefully this is after')")
         return self.getWrappedBlob__(newID)
 
     def __call__(self, *args):
@@ -89,6 +90,7 @@ class Bifrost:
     self.blobs = {0: (self.windowId, False)}
     self.primitive = None
     self.error = None
+    self.callback = None
 
   def jserror(self):
     err = self.error
@@ -99,6 +101,9 @@ class Bifrost:
   def call(self, jsstring):
     bifrost.run(jsstring)
 
+  #def callDone(self, args):
+    #self.callback(args);
+
     #rewrite, messy hack at 5am
   def callJSBlob(self, parentjsid, jsid, args):
     jsID = self.blobs[jsid][0]
@@ -106,7 +111,7 @@ class Bifrost:
     for arg in args:
         jsArgs.append(self.convertToJSObject(arg))
     currentId = self.nextId
-    self.call("window.bifrost.callBlobFunction(" + str(parentjsid) +", " + str(jsid) + ", " + str(currentId) + ", " + str(jsArgs) + ")") 
+    self.call("self.bifrost.callBlobFunction(" + str(parentjsid) +", " + str(jsid) + ", " + str(currentId) + ", " + str(jsArgs) + ")") 
     self.nextId += 1
     if (self.error is not None):
         self.jserror()
@@ -114,7 +119,7 @@ class Bifrost:
 
   def getJSBlobProperty(self, jsID, property): 
     currentId = self.nextId
-    self.call("window.bifrost.createBlobFromBlobProperty(" + str(jsID) + ", \"" + str(property) + "\", " + str(currentId) + ")") 
+    self.call("self.bifrost.createBlobFromBlobProperty(" + str(jsID) + ", \"" + str(property) + "\", " + str(currentId) + ")") 
     self.nextId += 1
     if (self.error is not None):
         self.jserror()
@@ -122,14 +127,14 @@ class Bifrost:
 
   def getJSBlobPrimitive(self, pythonID):
     jsID = self.blobs[pythonID][0]
-    self.call("window.bifrost.getBlobPrimitive(" + str(jsID) + ")")
+    self.call("self.bifrost.getBlobPrimitive(" + str(jsID) + ")")
     if (self.error is not None):
         self.jserror()
     return self.primitive
 
   def setJSBlobPrimitive(self, pythonID, property, value):
     jsID = self.blobs[pythonID][0]
-    self.call("window.bifrost.setBlobPropertyToPrimitive(" + str(jsID) + ", \"" + str(property) + "\", " + self.convertToJSObject(value) + ")")
+    self.call("self.bifrost.setBlobPropertyToPrimitive(" + str(jsID) + ", \"" + str(property) + "\", " + self.convertToJSObject(value) + ")")
     if (self.error is not None):
         self.jserror()
     
