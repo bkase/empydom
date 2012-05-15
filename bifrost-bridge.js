@@ -106,8 +106,44 @@ window.bifrost = (function() {
         return args;
     };
 
+    var countSpacesBeforeWordChar = function(str) {
+        var spaces = 0;
+        for (var i = 0; i < str.length; i++) {
+            if (str.charAt(i) == '\n') {
+                spaces = 0;
+            }
+            else if (str.charAt(i) == ' ') {
+                spaces += 1;
+            }
+            else {
+                return spaces;
+            }
+        }
+    };
+
+    var fixSpacing = function(code, spaces) {
+        var lines = code.split("\n");
+
+        lines[0] = lines[0] + "\n";
+        for (var i = 1; i < lines.length; i++) {
+            lines[i] = lines[i].substr(spaces) + "\n";
+        }
+        return lines.join("");
+    };
+
     var module = {
         'blobs': blobs,
+        'executePythonScripts': function() {
+            //from https://developer.mozilla.org/En/Using_web_workers
+            Array.prototype.forEach.call(
+                    document.querySelectorAll("script[type=\"text\/python\"]"),
+                    function(scriptTag) {
+                        var spacesBefore = countSpacesBeforeWordChar(scriptTag.innerHTML);
+                        var pycode = scriptTag.innerHTML.trim();
+                        pycode = fixSpacing(pycode, spacesBefore);
+                        Python.eval(pycode);
+                    });
+        },
         'createBlobFromJSON': function(jsonStr, otherBlobID) {
             var currID = createBlob(JSON.parse(jsonStr));
             returnBlobToPython(currID, otherBlobID);
