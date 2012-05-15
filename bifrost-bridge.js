@@ -78,8 +78,40 @@ window.bifrost = (function() {
         }
     };
 
+    var swapQuotes = function(strWithQuotes) {
+        return strWithQuotes.replace(/'/g, '\u2190').replace(/"/g, "'").replace(/\u2190/g, '"');
+    };
+
+    var convertJSONtoObj = function(args) {
+        if (args.length) {
+            for (var i = 0; i < args.length; i++) {
+                //if JSON.parse succeeds assume it's an object
+                try {
+                    args[i] = swapQuotes(args[i]);
+                    var obj = JSON.parse(args[i]);
+                    args[i] = obj;
+                }
+                catch(e) { }
+            }
+        }
+        else {
+            args = swapQuotes(args);
+            //if JSON.parse succeeds assume it's an object
+            try {
+                var obj = JSON.parse(args);
+                args = obj;
+            }
+            catch(e) { }
+        }
+        return args;
+    };
+
     var module = {
         'blobs': blobs,
+        'createBlobFromJSON': function(jsonStr, otherBlobID) {
+            var currID = createBlob(JSON.parse(jsonStr));
+            returnBlobToPython(currID, otherBlobID);
+        },
         'createBlobFromBlobProperty': function(sourceBlobID, property, otherBlobID){
             try {
                 var currID = createBlob(blobs[sourceBlobID].val[property]);
@@ -92,6 +124,8 @@ window.bifrost = (function() {
         'callBlobFunction': function(parentBlobID, localBlobID, otherBlobID, args){
 
             try {
+                args = convertJSONtoObj(args);
+
                 //TODO: make this fix less hacky (window.document(10) won't throw an error now)
                 if (blobs[localBlobID].val.apply !== undefined) {
                     var currID = createBlob(blobs[localBlobID].val.apply(blobs[parentBlobID].val, args));
@@ -111,9 +145,9 @@ window.bifrost = (function() {
                 throwInPython(e.toString());
             }
         },
-        'setBlobPropertyToPrimitive': function(localBlobID, property, primitive) {
+        'setBlobPropertyToValue': function(localBlobID, property, value) {
             try {
-                blobs[localBlobID].val[property] = primitive;
+                blobs[localBlobID].val[property] = value;
             }
             catch(e) {
                 throwInPython(e.toString());
