@@ -99,7 +99,7 @@ class Bifrost:
     jsID = self.blobs[jsid][0]
     jsArgs = []
     for arg in args:
-        jsArgs.append(self.convertToJSObject(arg))
+        jsArgs.append(self.convertToJSObject(arg,True))
     currentId = self.nextId
     self.call("window.bifrost.callBlobFunction(" + str(parentjsid) +", " + str(jsid) + ", " + str(currentId) + ", " + str(jsArgs) + ")") 
     self.nextId += 1
@@ -124,14 +124,15 @@ class Bifrost:
 
   def setJSBlobPrimitive(self, pythonID, prop, value):
     jsID = self.blobs[pythonID][0]
-    self.call("window.bifrost.setBlobPropertyToValue(" + str(jsID) + ", \"" + str(prop) + "\", " + self.convertToJSObject(value) + ")")
+    self.call("window.bifrost.setBlobPropertyToValue(" + str(jsID) + ", \"" + str(prop) + "\", " + self.convertToJSObject(value,False) + ")")
     if (self.error is not None):
         self.jserror()
     
 
-    #rewrite, should be recursive 
-  def convertToJSObject(self, pythonObj):
-    if (type(pythonObj) == 'str'):
+  #If the object is in a list than even if str, 
+  #it needs to be same due to str() reprs
+  def convertToJSObject(self, pythonObj, isInList):
+    if (type(pythonObj) == str and isInList == False):
         return "\"" + pythonObj + "\""
     return str(pythonObj)
 
