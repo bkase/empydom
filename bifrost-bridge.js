@@ -144,6 +144,17 @@ window.bifrost = (function() {
                         Python.eval(pycode);
                     });
         },
+        'delBlob': function(sourceBlobID) {
+            console.log(sourceBlobID)
+            try {
+                delete blobs[sourceBlobID];
+            }
+            catch(e) {
+                throwInPython(e.toString());
+            }
+        },
+        //Objects passed from Python to JavaScript can be taken to be immutable
+        //They are pass by value
         'createBlobFromJSON': function(jsonStr, otherBlobID) {
             var currID = createBlob(JSON.parse(jsonStr));
             returnBlobToPython(currID, otherBlobID);

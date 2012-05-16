@@ -37,6 +37,9 @@
                 newID = self.pyjs__.callJSBlob(self.parentJSID__, self.jsID__, args)
                 return self.getWrappedBlob__(newID)
 
+            def __del__(self):
+                self.pyjs__.delBlob(self.jsID__)
+
             def getWrappedBlob__(self, id):
                 isPrimitive = self.pyjs__.blobs[id][1]
                 if isPrimitive:
@@ -63,6 +66,10 @@
 
           def call(self, jsstring):
             bifrost.run(jsstring)
+
+          def delBlob(self, jsID):
+            self.call("window.bifrost.delBlob(" + str(jsID) + ")")
+            del self.blobs[jsID]
 
             #rewrite, messy hack at 5am
           def callJSBlob(self, parentjsid, jsid, args):
