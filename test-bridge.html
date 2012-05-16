@@ -57,6 +57,7 @@
             self.blobs = {0: (self.windowId, False)}
             self.primitive = None
             self.error = None
+            self.funcs = []
 
           def jserror(self):
             err = self.error
@@ -105,12 +106,18 @@
             if (self.error is not None):
                 self.jserror()
             
+          def wrapFunction(self, func):
+              self.funcs.append(func)
+              index = len(self.funcs)-1
+              return """==%%==%%==function() {var argString = window.bifrost.explodeArgs(arguments); Python.eval( "pyjs.funcs[""" + str(index) + """](" + argString + ")\\ndel pyjs.funcs[-1]");}"""
 
           #If the object is in a list than even if str, 
           #it needs to be same due to str() reprs
           def convertToJSObject(self, pythonObj, isInList):
             if (type(pythonObj) == str and isInList == False):
                 return "\"" + pythonObj + "\""
+            elif (type(pythonObj) == type(lambda x: x)):
+                return self.wrapFunction(pythonObj)
             return str(pythonObj)
 
         pyjs = Bifrost()

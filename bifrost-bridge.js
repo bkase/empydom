@@ -82,28 +82,27 @@ window.bifrost = (function() {
         return strWithQuotes.replace(/'/g, '\u2190').replace(/"/g, "'").replace(/\u2190/g, '"');
     };
 
-    var convertJSONtoObj = function(args) {
-        if (args.length) {
-            for (var i = 0; i < args.length; i++) {
-                //if JSON.parse succeeds assume it's an object
-                try {
-                    args[i] = swapQuotes(args[i]);
-                    var obj = JSON.parse(args[i]);
-                    args[i] = obj;
-                }
-                catch(e) { }
-            }
+    var convertJSONtoObj = function(json) {
+        
+        json = swapQuotes(json);
+        //if JSON.parse succeeds assume it's an object
+        try {
+            var obj = JSON.parse(json);
+            json = obj;
         }
-        else {
-            args = swapQuotes(args);
-            //if JSON.parse succeeds assume it's an object
-            try {
-                var obj = JSON.parse(args);
-                args = obj;
-            }
-            catch(e) { }
+        catch(e) { }
+        return json;
+    };
+
+    var templateToFunc = function(arg) {
+        var CANARY_LEN = 10;
+        
+        if (/^==%%==%%==/.test(arg)) {
+            console.log(arg.substr(CANARY_LEN));
+            arg = eval("(" + arg.substr(CANARY_LEN) + ")");
         }
-        return args;
+
+        return arg;
     };
 
     var countSpacesBeforeWordChar = function(str) {
@@ -145,13 +144,19 @@ window.bifrost = (function() {
                     });
         },
         'delBlob': function(sourceBlobID) {
-            console.log(sourceBlobID)
             try {
                 delete blobs[sourceBlobID];
             }
             catch(e) {
                 throwInPython(e.toString());
             }
+        },
+        'explodeArgs': function(argList) {
+            var explodedArgs = argList[0];
+            for (var i = 1; i < argList.length; i++) {
+                 explodedArgs += "," + argList[i];
+            }
+            return explodedArgs;
         },
         //Objects passed from Python to JavaScript can be taken to be immutable
         //They are pass by value
@@ -170,18 +175,21 @@ window.bifrost = (function() {
         },
         'callBlobFunction': function(parentBlobID, localBlobID, otherBlobID, args){
 
-            try {
-                args = convertJSONtoObj(args);
+            //try {
+                for (var i = 0; i < args.length; i++) {
+                    args[i] = convertJSONtoObj(args[i]);
+                    args[i] = templateToFunc(args[i]);
+                }
 
                 //TODO: make this fix less hacky (window.document(10) won't throw an error now)
                 if (blobs[localBlobID].val.apply !== undefined) {
                     var currID = createBlob(blobs[localBlobID].val.apply(blobs[parentBlobID].val, args));
                     returnBlobToPython(currID, otherBlobID);
                 }
-            }
-            catch(e) {
-                throwInPython(e.toString());
-            }
+            //}
+            //catch(e) {
+                //throwInPython(e.toString());
+            //}
         },
         'getBlobPrimitive': function(localBlobID) {
             try {
