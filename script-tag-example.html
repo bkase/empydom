@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Empythoned</title>
+    <!-- Canvas example adapted from https://developer.mozilla.org/en/Canvas_tutorial/Basic_animations -->
+    <script type="text/python">
+import math
+from datetime import datetime
+
+def init():
+  clock()
+  window.setInterval(clock,5000)
+
+def clock():
+  print "calling clock!"
+  ctx = window.document.getElementById('canvas').getContext('2d')
+  ctx.save()
+  ctx.clearRect(0,0,150,150)
+  ctx.translate(75,75)
+  ctx.scale(0.4,0.4)
+  ctx.rotate(-math.pi/2)
+  ctx.strokeStyle = "black"
+  ctx.fillStyle = "white"
+  ctx.lineWidth = 8
+  ctx.lineCap = "round"
+
+  #Hour marks
+  ctx.save()
+  for i in xrange(12):
+    ctx.beginPath()
+    ctx.rotate(-math.pi/6)
+    ctx.moveTo(100,0)
+    ctx.lineTo(120,0)
+    ctx.stroke()
+  
+  ctx.restore()
+
+  sec = datetime.now().second
+  min = datetime.now().minute
+  hr = datetime.now().hour
+
+  hr = hr-12 if hr >= 12 else hr
+  ctx.fillStyle = "black"
+
+  #write hours
+  ctx.save()
+  ctx.rotate(hr*(math.pi/6) + (math.pi/360)*min + (math.pi/21600)*sec)
+  ctx.lineWidth = 14
+  ctx.beginPath()
+  ctx.moveTo(-20,0)
+  ctx.lineTo(80,0)
+  ctx.stroke()
+  ctx.restore()
+
+  #write minutes
+  ctx.save()
+  ctx.rotate( (math.pi/30)*min + (math.pi/1800)*sec )
+  ctx.lineWidth = 10
+  ctx.beginPath()
+  ctx.moveTo(-28,0)
+  ctx.lineTo(112,0)
+  ctx.stroke()
+  ctx.restore()
+
+  #write second
+  ctx.save()
+  ctx.rotate(sec*math.pi/30)
+  ctx.strokeStyle = "#D40000"
+  ctx.fillStyle = "#D40000"
+  ctx.lineWidth = 6
+  ctx.beginPath()
+  ctx.moveTo(-30,0)
+  ctx.lineTo(83,0)
+  ctx.stroke()
+  ctx.restore()
+
+  ctx.beginPath()
+  ctx.lineWidth = 14
+  ctx.strokeStyle = '#325FA2'
+  ctx.arc(0,0,142,0,math.pi*2,True)
+  ctx.stroke()
+
+  ctx.restore()
+  
+init()
+    </script>
+    <script>
+        window.onEmpydomReady = function() {
+                window.empydom.executePythonScripts();
+            };
+    </script>
+  </head>
+  <body>
+    <div id='give_me_empydom_please'></div>
+    <h1>Empydom Demo</h1>
+    <textarea id="input" style="font-family: monospace; width: 80%" rows="8"></textarea>
+
+    <input id="button" type="button" value="Execute" style="display: block; margin: auto" />
+    <div id="counter">0</div>
+    <canvas id="canvas" width="300" height="300"></canvas>  
+    <textarea id="output" style="font-family: monospace; width: 80%" rows="8"></textarea>
+    <hr>
+  </body>
+</html>
