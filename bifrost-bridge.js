@@ -4,7 +4,7 @@
 //var PyEval = require(Python).eval;
 
 //TODO: Blobs on both sides (JavaScript and Python) should be reference counted
-window.bifrost = (function() {
+window.empydom = (function() {
 
     // a blob is an object with properties 'val' and 'isPrimitive'
     var blobs = {};
@@ -66,6 +66,7 @@ window.bifrost = (function() {
             blobs[currID].isPrimitive = false;
         }
         nextID += 1;
+        console.log("making:",currID,blobs[currID]);
         return currID;
     };
 
@@ -183,6 +184,7 @@ window.bifrost = (function() {
 
                 //TODO: make this fix less hacky (window.document(10) won't throw an error now)
                 if (blobs[localBlobID].val.apply !== undefined) {
+                    console.log(parentBlobID,blobs[parentBlobID],blobs);
                     var currID = createBlob(blobs[localBlobID].val.apply(blobs[parentBlobID].val, args));
                     returnBlobToPython(currID, otherBlobID);
                 }
