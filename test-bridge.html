@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Empythoned</title>
+    <title>Empydom Demo</title>
     <script src="json2.js"> </script>
     <script type="text/python">
         print "This goes to the output console"
@@ -16,6 +16,7 @@
           if (chr !== null) output.value += String.fromCharCode(chr);
         });
 
+        //run code in <script> tags
         window.empydom.executePythonScripts();
 
         button.onclick = function() {
