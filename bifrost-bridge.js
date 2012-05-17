@@ -66,7 +66,6 @@ window.empydom = (function() {
             blobs[currID].isPrimitive = false;
         }
         nextID += 1;
-        console.log("making:",currID,blobs[currID]);
         return currID;
     };
 
@@ -145,12 +144,15 @@ window.empydom = (function() {
                     });
         },
         'delBlob': function(sourceBlobID) {
-            try {
-                delete blobs[sourceBlobID];
-            }
-            catch(e) {
-                throwInPython(e.toString());
-            }
+            //TODO: Make this function similar to Python's `del` we only want 
+            //      to decrement the reference count, not delete the property
+
+            //try {
+                //delete blobs[sourceBlobID];
+            //}
+            //catch(e) {
+                //throwInPython(e.toString());
+            //}
         },
         'explodeArgs': function(argList) {
             var explodedArgs = argList[0];
@@ -184,7 +186,6 @@ window.empydom = (function() {
 
                 //TODO: make this fix less hacky (window.document(10) won't throw an error now)
                 if (blobs[localBlobID].val.apply !== undefined) {
-                    console.log(parentBlobID,blobs[parentBlobID],blobs);
                     var currID = createBlob(blobs[localBlobID].val.apply(blobs[parentBlobID].val, args));
                     returnBlobToPython(currID, otherBlobID);
                 }
