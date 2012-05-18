@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Empydom Clock</title>
+    <!-- Canvas example adapted from https://developer.mozilla.org/en/Canvas_tutorial/Basic_animations -->
+    <script type="text/javascript">
+        window.drawClock = function() {
+          var now = new Date();
+          var ctx = document.getElementById('canvas').getContext('2d');
+          ctx.save();
+          ctx.clearRect(0,0,150,150);
+          ctx.translate(75,75);
+          ctx.scale(0.4,0.4);
+          ctx.rotate(-Math.PI/2);
+          ctx.strokeStyle = "black";
+          ctx.fillStyle = "white";
+          ctx.lineWidth = 8;
+          ctx.lineCap = "round";
+
+          // Hour marks
+          ctx.save();
+          for (var i=0;i<12;i++){
+            ctx.beginPath();
+            ctx.rotate(Math.PI/6);
+            ctx.moveTo(100,0);
+            ctx.lineTo(120,0);
+            ctx.stroke();
+          }
+          ctx.restore();
+          
+          var sec = now.getSeconds();
+          var min = now.getMinutes();
+          var hr  = now.getHours();
+          hr = hr>=12 ? hr-12 : hr;
+
+          ctx.fillStyle = "black";
+
+          // write Hours
+          ctx.save();
+          ctx.rotate( hr*(Math.PI/6) + (Math.PI/360)*min + (Math.PI/21600)*sec )
+          ctx.lineWidth = 14;
+          ctx.beginPath();
+          ctx.moveTo(-20,0);
+          ctx.lineTo(80,0);
+          ctx.stroke();
+          ctx.restore();
+
+          // write Minutes
+          ctx.save();
+          ctx.rotate( (Math.PI/30)*min + (Math.PI/1800)*sec )
+          ctx.lineWidth = 10;
+          ctx.beginPath();
+          ctx.moveTo(-28,0);
+          ctx.lineTo(112,0);
+          ctx.stroke();
+          ctx.restore();
+          
+          // Write seconds
+          ctx.save();
+          ctx.rotate(sec * Math.PI/30);
+          ctx.strokeStyle = "#D40000";
+          ctx.fillStyle = "#D40000";
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(-30,0);
+          ctx.lineTo(83,0);
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.lineWidth = 14;
+          ctx.strokeStyle = '#325FA2';
+          ctx.arc(0,0,142,0,Math.PI*2,true);
+          ctx.stroke();
+
+          ctx.restore();
+        }
+    </script>
+    <script type="text/python">
+
+def init():
+  clock()
+  window.setInterval(clock,1000)
+
+def clock(*args):
+  window.drawClock()
+    
+init()
+    </script>
+    <script type="text/javascript">
+        window.onEmpydomReady = function() {
+                window.empydom.executePythonScripts();
+                window.document.getElementById('loading').innerHTML = "";
+            };
+    </script>
+  </head>
+  <body>
+    <div id='give_me_empydom_please'></div>
+    <h1>Empydom Clock (refreshes every second)</h1>
+    <div id='loading'>loading...</div>
+    <canvas id="canvas" width="300" height="300"></canvas>  
+  </body>
+</html>

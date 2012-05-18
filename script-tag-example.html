@@ -88,12 +88,14 @@ init()
     <script>
         window.onEmpydomReady = function() {
                 window.empydom.executePythonScripts();
+                window.document.getElementById('loading').innerHTML = "";
             };
     </script>
   </head>
   <body>
     <div id='give_me_empydom_please'></div>
     <h1>Empydom Clock (refreshes every 7 seconds)</h1>
+    <div id='loading'>loading...</div>
     <canvas id="canvas" width="300" height="300"></canvas>  
   </body>
 </html>

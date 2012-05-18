@@ -18,6 +18,7 @@
 
         //run code in <script> tags
         window.empydom.executePythonScripts();
+        window.document.getElementById('loading').innerHTML = "";
 
         button.onclick = function() {
           if (Python.isFinished(input.value)) {
@@ -40,6 +41,7 @@
   <body>
     <div id='give_me_empydom_please'></div>
     <h1>Empydom Demo</h1>
+    <div id='loading'>loading...</div>
     <textarea id="input" style="font-family: monospace; width: 80%" rows="8"></textarea>
 
     <input id="button" type="button" value="Execute" style="display: block; margin: auto" />
