@@ -9,9 +9,10 @@ from datetime import datetime
 
 def init():
   clock()
-  window.setInterval(clock,5000)
+  window.setInterval(clock,7000)
 
-def clock():
+#firefox wants to pass an argument, chrome does not
+def clock(*args):
   print "calling clock!"
   ctx = window.document.getElementById('canvas').getContext('2d')
   ctx.save()
@@ -92,7 +93,7 @@ init()
   </head>
   <body>
     <div id='give_me_empydom_please'></div>
-    <h1>Empydom Clock</h1>
+    <h1>Empydom Clock (refreshes every 7 seconds)</h1>
     <canvas id="canvas" width="300" height="300"></canvas>  
   </body>
 </html>
