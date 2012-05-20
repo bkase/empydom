@@ -8,13 +8,16 @@ import math
 from datetime import datetime
 
 def init():
-  clock()
-  window.setInterval(clock,7000)
+  ctx = window.document.getElementById('canvas').getContext('2d')
+  def updateClock(*args):
+    clock(ctx)
+  updateClock()
+  window.setInterval(updateClock,2000)
 
 #firefox wants to pass an argument, chrome does not
-def clock(*args):
+def clock(ctx):
   print "calling clock!"
-  ctx = window.document.getElementById('canvas').getContext('2d')
+  #ctx = window.document.getElementById('canvas').getContext('2d')
   ctx.save()
   ctx.clearRect(0,0,150,150)
   ctx.translate(75,75)
@@ -94,7 +97,7 @@ init()
   </head>
   <body>
     <div id='give_me_empydom_please'></div>
-    <h1>Empydom Clock (refreshes every 7 seconds)</h1>
+    <h1>Empydom Clock (refreshes every 2 seconds)</h1>
     <div id='loading'>loading...</div>
     <canvas id="canvas" width="300" height="300"></canvas>  
   </body>
