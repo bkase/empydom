@@ -1,0 +1,155 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>Empydom</title>
+  <meta name="description" content="Python-Javascript DOM bridge">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Empydom</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">Python-Javascript DOM bridge</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/bkase/empydom/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/bkase/empydom/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/bkase/empydom" class="code">View Empydom on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>Empydom</h1>
+
+<hr><p>Thanks to <a href="https://github.com/replit/empythoned">https://github.com/replit/empythoned</a> for making Empythoned and <a href="https://github.com/max99x">https://github.com/max99x</a> for
+helping me out when I had some questions.</p>
+
+<p>Thanks to Evan Shapiro for helping on some of the core parts in the bridge</p>
+
+<p>Thanks to Professor David Kosbie for providing the idea for and giving me the opportunity to work on this project</p>
+
+<h2>About</h2>
+
+<p>Empydom is a Python-DOM bridge built on top of replit's empythoned
+Empydom lets you use Python in <code>&lt;script&gt;</code> tags within an HTML document to manipulate the DOM</p>
+
+<h2>How to use</h2>
+
+<p>Install the <code>empydom.user.js</code> for Chrome or <code>empydom.xpi</code> for Firefox by dragging and dropping the file into your chosen browser.</p>
+
+<p>You can now visit pages that use Empydom.</p>
+
+<ul>
+<li>See <a href="http://www.bridgejs.com/test-bridge.html">http://www.bridgejs.com/test-bridge.html</a> for an example with a console for input and ouput</li>
+<li>See <a href="http://www.bridgejs.com/script-tag-example.html">http://www.bridgejs.com/script-tag-example.html</a> for a large script-tag example with canvas</li>
+<li>See <a href="http://www.bridgejs.com/fast-clock.html">http://www.bridgejs.com/fast-clock.html</a> for a faster version of the same demo with most logic in JavaScript</li>
+</ul><h3>Programming with Empydom</h3>
+
+<p>Include </p>
+
+<div class="highlight">
+<pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'give_me_empydom_please'</span><span class="nt">&gt;&lt;/div&gt;</span> 
+</pre>
+</div>
+
+
+<p>somewhere in the body of your HTML page.
+This ensures that the extension knows about Empydom.</p>
+
+<hr><p>Above your Python code, include any JavaScript libraries that you want to use within your Python code</p>
+
+<hr><p>Below your Python code, include this: </p>
+
+<div class="highlight">
+<pre><span class="nt">&lt;script&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">onEmpydomReady</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nb">window</span><span class="p">.</span><span class="nx">empydom</span><span class="p">.</span><span class="nx">executePythonScripts</span><span class="p">();</span> <span class="p">};</span> <span class="nt">&lt;/script&gt;</span>`
+</pre>
+</div>
+
+
+<p>The extension calls <code>window.onEmpydomReady()</code> when it finishes being loaded.
+<code>window.empydom.executePythonScripts()</code> executes Python within all <code>&lt;script text="text/python"&gt;</code></p>
+
+<p>If you pass a function to <code>executePythonScripts()</code> that function will be called with the character code to output as a buffer.
+The default function which outputs each line to the console is:</p>
+
+<div class="highlight">
+<pre><span class="kd">function</span><span class="p">(</span><span class="nx">chr</span><span class="p">)</span> <span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="nx">chr</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+     <span class="nx">realChar</span> <span class="o">=</span> <span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="nx">chr</span><span class="p">);</span>
+     <span class="nx">charBuffer</span> <span class="o">+=</span> <span class="nx">realChar</span><span class="p">;</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nx">realChar</span> <span class="o">==</span> <span class="s1">'\n'</span><span class="p">)</span> <span class="p">{</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">charBuffer</span><span class="p">);</span>
+       <span class="nx">charBuffer</span> <span class="o">=</span> <span class="s2">""</span><span class="p">;</span>
+     <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+<p>Note: <code>charBuffer</code> is a variable declared as the empty string outside of the function body.</p>
+
+<hr><p>All of your Python code goes in <code>&lt;script type="text/python"&gt;</code> tags.
+Most Python modules are supported, a few are included within the extesion, but many more must be downloaded from whichever server is hosting the page from an <code>extern</code> folder</p>
+
+<hr><p>In Python, you have access to the JavaScript object <code>window</code> as a Python object.</p>
+
+<ul>
+<li>You add properties to <code>window</code>, you can read values from properties within <code>window</code>, and you can call functions from properties within <code>window</code>.</li>
+<li>You can pass Python strings, numbers, lists, dictionaries, and functions as parameters to any function in <code>window</code> and they will be interpreted
+as JavaScript strings, numbers, arrays, objects, and functions respectively.</li>
+<li>JavaScript errors are percolated up to the Python stack trace and the output function is called for each character of
+the JavaScript state</li>
+</ul><h2>Quirks</h2>
+
+<p>In Firefox, the page doesn't render until Empydom loads completely, while in Chrome it renders immediately then loads Empydom.</p>
+
+<p>Firefox sometimes thinks the script is unresponsive. This is partly related to the overhead of initializing Empythoned and 
+partly related to initializing the DOM bridge. Hopefully, with optimizations, this will stop soon.</p>
+
+<p>These problems could be partially alleviated if Empydom worked in a web-worker since it would be running in the background in a dedicated thread.
+See issue #7, most of the infrastructure of porting Empydom is there, the only problem is the lack of a blocking recieve or
+a force check for messages for the web-worker.</p>
+
+<p>Do not make calls passing functions as parameters in tight-loops. Function memory management is non-existant. The problem is that
+JavaScript can call a passed function at anytime so we can't free it from Python.
+Additionally, blobs are never freed from JavaScript -- but the overhead from this is much less than the function issue. Fixing
+the blob memory issue will probably require including a reference to the parent blob object for each blob.</p>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/bkase" class="avatar"><img src="https://secure.gravatar.com/avatar/f47f40fd4e80afe4fcca0dd5c961db57?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/bkase">bkase</a> maintains <a href="https://github.com/bkase/empydom">Empydom</a></p>
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/bkase/empydom/tarball/master" class="tar">tar</a><a href="https://github.com/bkase/empydom/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
