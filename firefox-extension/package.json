@@ -1,9 +1,9 @@
 {
-    "name": "empythoned-bifrost", 
+    "name": "empydom", 
     "license": "MIT", 
     "author": "", 
     "version": "0.1", 
-    "fullName": "empythoned-bifrost", 
+    "fullName": "empydom", 
     "id": "jid1-E7x4tyrX0aAEJg", 
     "description": "A Python-Javascript bridge"
 }
