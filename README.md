@@ -20,13 +20,20 @@ Run `./tools/build.sh`.
 Check `out/` for the output.
 
 ## How to use
-Install the `empydom.user.js` for Chrome or `empydom.xpi` for Firefox by dragging and dropping the file into your chosen browser.
+Install the `empydom.user.js` for Chrome or `empydom.xpi` for Firefox by dragging and dropping the file into your chosen browser. Chrome updated, so now you have to go to `chrome://chrome/extensions/` and check the box on the upper right-hand side to enable developer mode and drop the user-script on this tab.
 
 You can now visit pages that use Empydom.
 
-* See http://www.bridgejs.com/test-bridge.html for an example with a console for input and ouput
-* See http://www.bridgejs.com/script-tag-example.html for a large script-tag example with canvas
-* See http://www.bridgejs.com/fast-clock.html for a faster version of the same demo with most logic in JavaScript
+* See `srv/test-bridge.html` for an example with a console for input and ouput
+* See `srv/script-tag-example.html` for a large script-tag example with canvas
+* See `srv/fast-clock.html` for a faster version of the same demo with most logic in JavaScript
+
+Run your webserver from the `srv/` directory.
+If you have Python 2.x installed you can use 
+```python
+python -m SimpleHTTPServer [port]
+```
+to start a server from the current directory.
 
 ### Programming with Empydom
 Include 
