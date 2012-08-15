@@ -12,6 +12,13 @@ Empydom is a Python-DOM bridge built on top of replit's empythoned
 Empydom lets you use Python in `<script>` tags within an HTML document to manipulate the DOM
 
 
+## How to build
+Edit `tools/build.sh` and update the constants at the top of the file with your system's specific configuration.
+
+Run `./tools/build.sh`.
+
+Check `out/` for the output.
+
 ## How to use
 Install the `empydom.user.js` for Chrome or `empydom.xpi` for Firefox by dragging and dropping the file into your chosen browser.
 
@@ -89,3 +96,15 @@ Do not make calls passing functions as parameters in tight-loops. Function memor
 JavaScript can call a passed function at anytime so we can't free it from Python.
 Additionally, blobs are never freed from JavaScript -- but the overhead from this is much less than the function issue. Fixing
 the blob memory issue will probably require including a reference to the parent blob object for each blob.
+
+## Contribute
+
+Pull-requests are very welcome!
+
+I want to try to keep my history linear and organized, so I would like all pull-requests to be only one commit. I will cherry-pick your commit on top
+of the tip of `origin/master`.
+Before you send a pull-request and every time you change your code on a pull-request, 
+sqash all the relevant commits together and `git push --force` on your fork. (read up on `git rebase -i` if you are not familiar with rewriting history). 
+
+Feel free to contact me if you are confused at all -- this is an experiment, I want to see if I can maintain this repository structure using GitHub.
+

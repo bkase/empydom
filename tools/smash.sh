@@ -7,4 +7,4 @@ then
 fi
  
 # TODO: make this regex NOT put a \n if last character is a \
-cat $1 | sed 's/\\/\\\\/g' | sed 's/'"'"'/\\'"'"'/g' | sed 's/\(.*\)/'\''\1\\n'\'' + /g'
+cat $1 | sed 's/\\/\\\\/g' | sed 's/'"'"'/\\'"'"'/g' | sed 's/\(.*\)/'\''\1\\n'\'' + /g' | sed '$d' && echo \'\'

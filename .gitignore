@@ -1,3 +1,4 @@
 #.gitignore for bryj
 
 *.un~
+out/
